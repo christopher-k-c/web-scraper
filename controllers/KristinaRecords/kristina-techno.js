@@ -72,15 +72,20 @@ exports.kristina_technoindex_get = (req, res) => {
             catch (err) {
                 console.log(err);
             }
+            // Stop loading error
+            res.redirect('/');
         }
         saveFile()
     
             //  Close browser
             await browser.close()
         }
+
     
     
     run()
+
+
 
 
 
