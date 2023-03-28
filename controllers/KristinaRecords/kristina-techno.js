@@ -22,10 +22,24 @@ exports.kristina_technoindex_get = (req, res) => {
                 Array.from(document.querySelectorAll('.productlist-item'), (e) => {
                     const titleElement = e.querySelector('.productlist-meta .productlist-title-container .productlist-title');
                     const title = titleElement.innerText.trim();
+
+
                     const normalizeText = title.normalize('NFC')
-                    const u2013 = /\u2013/g;
-                    const change = normalizeText.replace(u2013, "-")
+                    const encoder = new TextEncoder();
+                    const decoder = new TextDecoder('utf-8');
+                    const normalizedData = encoder.encode(normalizeText);
+                    const decodedData = decoder.decode(normalizedData);
+                    const u2013 = /[\u2013\u200E]/g;
+                    const change = decodedData.replace(u2013, "-");
                     let type = ""
+                    change.includes("--") ? type += change.replace("--", "-") : type += change
+
+                    
+
+
+                    // const u2013 = /\u2013/g;
+                    // const change = normalizeText.replace(u2013, "-")
+                    // let type = ""
                     // const change = normalizeText.includes("/[-]/g") ? type += normalizeText.replace("/[-]/g", "-") : type += normalizeText
                     // const removeHyphen = title.includes("–") ? title.replace("–", "-") : title
 
@@ -41,7 +55,7 @@ exports.kristina_technoindex_get = (req, res) => {
                     const fullLink = homeURL.concat(detailLink)
 
 
-                    const [artist, recordName] = change.split(' - ');
+                    const [artist, recordName] = type.split(' - ');
                     return {
                         artist: artist,
                         recordName: recordName,
