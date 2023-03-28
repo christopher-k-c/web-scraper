@@ -7,14 +7,7 @@ const os = require('os');
 const path = require('path');
 
 
-exports.kristina_technoindex_get = (req, res) => {
-    
-    const prettier = require('prettier');
-    const fs = require('fs')
-    const puppeteer = require('puppeteer');
-    const os = require('os');
-    const path = require('path');
-    
+exports.kristina_technoindex_get = (req, res) => {    
     
     async function scrape() {
 
@@ -22,25 +15,41 @@ exports.kristina_technoindex_get = (req, res) => {
         const browser = await puppeteer.launch({headless: false});
         const page = await browser.newPage();
         await page.goto('https://www.kristinarecords.com/techno');
+        
 
         while (true) {    
             const links = await page.evaluate(() => 
                 Array.from(document.querySelectorAll('.productlist-item'), (e) => {
-                    const titleElement = e.querySelector('.productlist-meta .productlist-title-container');
+                    const titleElement = e.querySelector('.productlist-meta .productlist-title-container .productlist-title');
                     const title = titleElement.innerText.trim();
+                    const normalizeText = title.normalize('NFC')
+                    const u2013 = /\u2013/g;
+                    const change = normalizeText.replace(u2013, "-")
+                    let type = ""
+                    // const change = normalizeText.includes("/[-]/g") ? type += normalizeText.replace("/[-]/g", "-") : type += normalizeText
+                    // const removeHyphen = title.includes("–") ? title.replace("–", "-") : title
+
+
+
                     const price = e.querySelector('.productlist-meta .productlist-price-container .product-price').innerText
+                    const regex = /[\/\\\n]/g;
+                    const cleanPrice = price.replace(regex, "")
+
                     const image = e.querySelector('.productlist-image--main').getAttribute('data-image');
                     const detailLink = e.querySelector('.productlist-item-link').getAttribute('href')
                     const homeURL = 'https://www.kristinarecords.com'
                     const fullLink = homeURL.concat(detailLink)
-            
-                    const [artist, recordName] = title.split(' - ');
+
+
+                    const [artist, recordName] = change.split(' - ');
                     return {
                         artist: artist,
                         recordName: recordName,
-                        price: price,
+                        price: cleanPrice,
                         image: image,
-                        productURL: fullLink
+                        productURL: fullLink,
+
+
                     };
                 })
             );
