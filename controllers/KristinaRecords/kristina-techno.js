@@ -34,21 +34,48 @@ exports.kristina_technoindex_get = (req, res) => {
                     let type = ""
                     change.includes("--") ? type += change.replace("--", "-") : type += change
 
-                    
-
-
-                    // const u2013 = /\u2013/g;
-                    // const change = normalizeText.replace(u2013, "-")
-                    // let type = ""
-                    // const change = normalizeText.includes("/[-]/g") ? type += normalizeText.replace("/[-]/g", "-") : type += normalizeText
-                    // const removeHyphen = title.includes("–") ? title.replace("–", "-") : title
-
-
-
                     const price = e.querySelector('.productlist-meta .productlist-price-container .product-price').innerText
+
+                    // let arr = {};
+
+                      
+                    let extraFinalPrice = {}
+
                     const regex = /[\/\\\n]/g;
                     const cleanPrice = price.replace(regex, "")
 
+                    if(cleanPrice.includes("Sale Price:")){
+
+                        let saleColon = cleanPrice.indexOf(":");
+                      
+                        let removeSalePrice = cleanPrice.slice(saleColon+1)
+                      
+                        let originalStr = removeSalePrice.indexOf("O");
+                      
+                        let originalColon = removeSalePrice.indexOf(":");
+                      
+                        let finalOutput = removeSalePrice.slice(0, originalStr) + removeSalePrice.slice(originalColon+1)
+                      
+                        let [sale, original] = finalOutput.split(" ")
+                      
+                        extraFinalPrice = {
+                      
+                          "sale": sale,
+                          "full": original,
+                      
+                        }
+                        
+                      } else{
+                      
+                        extraFinalPrice = {
+                        
+                            "full": cleanPrice
+                        
+                        }
+                      
+                    //   console.log(arr)
+                      
+                      }
                     const image = e.querySelector('.productlist-image--main').getAttribute('data-image');
                     const detailLink = e.querySelector('.productlist-item-link').getAttribute('href')
                     const homeURL = 'https://www.kristinarecords.com'
@@ -59,7 +86,7 @@ exports.kristina_technoindex_get = (req, res) => {
                     return {
                         artist: artist,
                         recordName: recordName,
-                        price: cleanPrice,
+                        price: extraFinalPrice,
                         image: image,
                         productURL: fullLink,
 
