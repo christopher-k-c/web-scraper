@@ -2,4 +2,4 @@
 
 # Record Store Scraper Project
 
-<img src="https://imgur.com/lyjIVpc"> 
+![alt text](https://imgur.com/lyjIVpc)
