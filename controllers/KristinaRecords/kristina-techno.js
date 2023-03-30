@@ -10,7 +10,12 @@ exports.kristina_technoindex_get = (req, res) => {
         const browser = await puppeteer.launch({headless: false});
         const page = await browser.newPage();
         await page.goto('https://www.kristinarecords.com/techno');
-        
+
+        // Get Genre 
+        const genre = await page.evaluate(() => {
+            const cleanGenre = /[//-]/g; 
+            return document.querySelector('.catnav-link').getAttribute('href').replace(cleanGenre, " ").trim() 
+        })
 
         // Infinite loop that breaks when next button is disabled 
         while (true) {    
@@ -85,7 +90,6 @@ exports.kristina_technoindex_get = (req, res) => {
                         image: image,
                         productURL: fullLink,
 
-
                     };
                 })
             );
@@ -109,6 +113,7 @@ exports.kristina_technoindex_get = (req, res) => {
 
         await browser.close();
 
+
         // Iterate over records array
         records.forEach(async (el) => {
 
@@ -123,6 +128,8 @@ exports.kristina_technoindex_get = (req, res) => {
                   },
                 image: el.image,
                 productURL: el.productURL,
+                genre: genre,
+                store: "Kristina Records"
     
             })
 

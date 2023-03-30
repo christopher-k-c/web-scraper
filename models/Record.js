@@ -6,7 +6,9 @@ const recordSchema = mongoose.Schema({
     recordName: String,
     price: {full: String, discounted: String},
     image: String,
-    productURL: String
+    productURL: String,
+    genre: String,
+    store: String
 
 
 },
