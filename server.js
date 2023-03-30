@@ -131,6 +131,14 @@ async function scrape() {
 
         })
 
+        // If exists on mongodb database
+            // Don't add another instance of it  
+            // However, if it has an updated field, update that field on the document that already exists on the mongo database 
+
+        // If the record does not exist on the mongo database upload it 
+
+        // If a record exists on the database but not in the records array... remove the instance of the record from the data base
+
         // Save the individual model to mongoDB using mongoose save method  
         await kristinaRecords.save();
     })   
