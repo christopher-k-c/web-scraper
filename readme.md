@@ -3,3 +3,4 @@
 # Record Store Scraper Project
 
 ![alt text](https://imgur.com/lyjIVpc)
+![alt text](https://i.imgur.com/lyjIVpc.png)
