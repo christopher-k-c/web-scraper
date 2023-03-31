@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const recordSchema = mongoose.Schema({
 
+    recId: String,
     artist: String,
     recordName: String,
     price: {full: String, discounted: String},

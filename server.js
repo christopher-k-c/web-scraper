@@ -24,6 +24,9 @@ async function scrape() {
             // Search dom and create array from ".productlist-item" node-list 
             Array.from(document.querySelectorAll('.productlist-item'), (e) => {
 
+                // Select unique identifier 
+                const dataId = e.getAttribute('data-item-id')
+
                 // Target all record titles and trim leading and trailing spaces
                 const titleElement = e.querySelector('.productlist-meta .productlist-title-container .productlist-title');
                 const title = titleElement.innerText.trim();
@@ -82,6 +85,7 @@ async function scrape() {
 
                 // The links const will return an array of objects 
                 return {
+                    recId: dataId,
                     artist: artist,
                     recordName: recordName,
                     price: extraFinalPrice,
@@ -118,6 +122,7 @@ async function scrape() {
         // Invoke a new instance of the Record model 
         const kristinaRecords = new Record({
 
+            recId: el.recId,
             artist: el.artist,
             recordName: el.recordName,
             price: {
