@@ -142,7 +142,7 @@ async function scrape() {
         // check if database reqId exists in the records array, if not remove 
         const allDocuments = await Record.find()
         allDocuments.forEach(async (document) => {
-            if(records.includes(document.recId)){
+            if(!records.includes(document.recId)){
                await Record.find({recId:document.recId}).remove().exec()
             }
         })
