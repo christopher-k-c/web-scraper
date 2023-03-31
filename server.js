@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const puppeteer = require('puppeteer');
 const {Record} = require("./models/Record");
+const radash = require('radash');
 
 async function scrape() {
 
@@ -136,6 +137,38 @@ async function scrape() {
 
         })
 
+
+
+        // check if database reqId exists in the records array, if not remove 
+        const allDocuments = await Record.find()
+        allDocuments.forEach(document => {
+            if(records.includes(document.recId)){
+                Record.find({recId:document.recId}).remove().exec()
+            }
+        })
+
+
+        // Store the database object matched using the findOne method other wise return null
+        // Need collate the data-item-id and replace the artist/recordName as values to search the database by
+        const existingRecord = await Record.findOne({ recId: `${el.recId}` });
+        if (existingRecord) {
+            const databaseRecord = radash.pick(existingRecord, [existingRecord.artist, existingRecord.recordName, existingRecord.price.full, existingRecord.price.discounted, existingRecord.price.image, existingRecord.price.productURL])
+            const updatedRecord = radash.pick(el, [el.artist, el.recordName, el.price.full, el.price.discounted, el.price.image, el.price.productURL])
+            if(radash.isEqual(databaseRecord, updatedRecord)){
+                console.log("WE ARE EQUAL")
+                return
+            } else if(!radash.isEqual(databaseRecord, updatedRecord)){
+                console.log("SOMETHING HAS GONE WRONG")
+                // Implement mongoose Method to update
+                existingRecord.updateOne(el)
+            }
+
+
+        } else {
+            // Save the individual model to mongoDB using mongoose save method  
+            await kristinaRecords.save();
+        }
+
         // If exists on mongodb database
             // Don't add another instance of it  
             // However, if it has an updated field, update that field on the document that already exists on the mongo database 
@@ -144,8 +177,8 @@ async function scrape() {
 
         // If a record exists on the database but not in the records array... remove the instance of the record from the data base
 
-        // Save the individual model to mongoDB using mongoose save method  
-        await kristinaRecords.save();
+        // // Save the individual model to mongoDB using mongoose save method  
+        // await kristinaRecords.save();
     })   
 }
 scrape();
