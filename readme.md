@@ -24,7 +24,7 @@ The data extracted includes the artist name, record name, price (full and discou
 
 ## To-do:
 
-- [ ] Only want code to add to database if it does not already exist (Mongoose tinker)
+- [x] Only want code to add to database if it does not already exist (Mongoose tinker)
 - [ ] Connect up to Mongodb Online cluster
     - [ ] Set-up dot-env
 - [ ] Dynamically scrape all categories on Kristina 
