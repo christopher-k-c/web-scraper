@@ -116,10 +116,93 @@ async function scrape() {
 
     // await browser.close();
 
+    let detailScrub = [];
 
     for(let b = 0; b < records.length; b++){
-        console.log(records[b])
+
+        await page.goto(records[b].productURL)
+        try {
+        await page.waitForSelector('.audio-block .sqs-block-content .sqs-audio-embed')
+
+        const label = await page.evaluate(() => {
+            // Get id from body
+            const recordId = document.body.id;
+            // Get Label 
+            const label = document.querySelector('.productitem-excerpt p:first-of-type')?.innerText
+            // Array of tracks
+            const audio = document.querySelectorAll('.audio-block .sqs-block-content .sqs-audio-embed')
+            // // Grab description using an optional chaining operator ?. - if the p tag is not avaiable return unidentified otherwise access the textContent
+            const description = document.querySelector('.html-block .sqs-block-content p')?.textContent;
+            // Initialize an empty array
+            const urls = []
+            let descrProp;
+            let labelProp;
+            let deatilObject = {}
+
+            
+            
+            if (audio.length > 0) {
+                // let trackObjects;
+                audio.forEach(el => {
+                    // Get the artist name of the current track
+                    const recordArtist = el.querySelector('.artistName').textContent;
+                    // Get the record name of the current track
+                    const recordTitle = el.querySelector('.title-wrapper .title').textContent;
+                    // Construct an object of key and pair values 
+                    const trackObjects = {
+                        recordId: recordId,
+                        songUrl: el.getAttribute('data-url') || null,
+                        songArtist: recordArtist || null,
+                        songName: recordTitle || null,
+                        // description: description ? document.querySelector('.html-block .sqs-block-content p').textContent : null 
+                    }
+    
+                    // Push object 
+                    urls.push(trackObjects)
+                })
+            } 
+
+            let descObject;
+            if(description){
+                descObject = {
+                    description: description
+                }  
+            }
+            descrProp = descObject
+
+            let labelValue;
+            if(label){
+                labelValue = {
+                    label: label
+                }
+            }
+            labelProp = labelValue
+
+            if(labelProp){
+                deatilObject = Object.assign({}, deatilObject, labelProp)
+            }
+            if(descrProp){
+                deatilObject = Object.assign({}, deatilObject, descrProp)
+            }
+            if(urls){
+                deatilObject = Object.assign({}, deatilObject, {urls})
+            }                    
+        });
+        console.log(label);
+      } catch (error) {
+        console.log('Element not found!');
+      }
+
+      
+      detailScrub.push(deatilObject);
     }
+
+
+
+
+
+    
+
 
 
     // Iterate over records array
