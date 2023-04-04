@@ -114,7 +114,12 @@ async function scrape() {
     
     }
 
-    await browser.close();
+    // await browser.close();
+
+
+    for(let b = 0; b < records.length; b++){
+        console.log(records[b])
+    }
 
 
     // Iterate over records array
@@ -137,18 +142,8 @@ async function scrape() {
 
         })
 
-
-
-        // check if database reqId exists in the records array, if not remove 
-        // const allDocuments = await Record.find();
-        // allDocuments.forEach(async (document) => {
-        //   if (!records.includes(document.recId)) {
-        //     await Record.deleteOne({ recId: document.recId });
-        //   }
-        // });
         // Get all records from the database
         const allRecords = await Record.find();
-
         // Delete records that are not present on the website
         for (const record of allRecords) {
         if (!records.some((r) => r.recId === record.recId)) {
