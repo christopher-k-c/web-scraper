@@ -140,25 +140,32 @@ async function scrape() {
 
 
         // check if database reqId exists in the records array, if not remove 
-        const allDocuments = await Record.find()
-        allDocuments.forEach(async (document) => {
-            if(!records.includes(document.recId)){
-               await Record.find({recId:document.recId}).remove().exec()
-            }
-        })
+        // const allDocuments = await Record.find();
+        // allDocuments.forEach(async (document) => {
+        //   if (!records.includes(document.recId)) {
+        //     await Record.deleteOne({ recId: document.recId });
+        //   }
+        // });
+        // Get all records from the database
+        const allRecords = await Record.find();
 
+        // Delete records that are not present on the website
+        for (const record of allRecords) {
+        if (!records.some((r) => r.recId === record.recId)) {
+            await Record.deleteOne({ recId: record.recId });
+        }
+        }
+
+        
         // Store the database object matched using the findOne method other wise return null
         // Need collate the data-item-id and replace the artist/recordName as values to search the database by
         const existingRecord = await Record.findOne({ recId: `${el.recId}` });
         if (existingRecord) {
             const databaseRecord = radash.pick(existingRecord, [existingRecord.artist, existingRecord.recordName, existingRecord.price.full, existingRecord.price.discounted, existingRecord.price.image, existingRecord.price.productURL])
             const updatedRecord = radash.pick(el, [el.artist, el.recordName, el.price.full, el.price.discounted, el.price.image, el.price.productURL])
-            if(radash.isEqual(databaseRecord, updatedRecord)){
-                return
-            } else if(!radash.isEqual(databaseRecord, updatedRecord)){
-                // Implement mongoose Method to update
+            if(!radash.isEqual(databaseRecord, updatedRecord)){
                 await existingRecord.updateOne(el)
-            }
+            } 
         } else {
             // Save the individual model to mongoDB using mongoose save method  
             await kristinaRecords.save();
