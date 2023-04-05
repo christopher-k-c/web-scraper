@@ -26,6 +26,8 @@ The data extracted includes the artist name, record name, price (full and discou
 
 - [x] Only want code to add to database if it does not already exist (Mongoose tinker)
 - [ ] Need to comment code; make concise descriptions / explanations  
+- [ ] Add conditional that takes into account records that are missing audio/descriptions
+  - [ ] Line 129, maybe target .content instead then add if inside page.evaluate()
 - [ ] Connect up to Mongodb Online cluster
     - [ ] Set-up dot-env
 - [ ] Dynamically scrape all categories on Kristina 
