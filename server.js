@@ -207,52 +207,63 @@ async function scrape() {
 
 
 
-// // Replace recorfs with detailScrub
-//     // Iterate over records array
-//     records.forEach(async (el) => {
+// Replace recorfs with detailScrub
+    // Iterate over records array
+    detailScrub.forEach(async (el) => {
+        
+        let urls = []
+        if(!_.isEmpty(el.urls)){
+            el.urls.forEach(urlEl => {
+                urls.push(urlEl)
+            })
+        }
 
-//         // Invoke a new instance of the Record model 
-//         const kristinaRecords = new Record({
+        // Invoke a new instance of the Record model 
+        const kristinaRecords = new Record({
 
-//             recId: el.recId,
-//             artist: el.artist,
-//             recordName: el.recordName,
-//             price: {
-//                 discounted: el.price.sale || null,
-//                 full: el.price.full || null
-//               },
-//             image: el.image,
-//             productURL: el.productURL,
-//             genre: genre,
-//             store: "Kristina Records"
+            recId: el.recId,
+            artist: el.artist,
+            recordName: el.recordName,
+            label: el.label,
+            price: {
+                discounted: el.price.sale || null,
+                full: el.price.full || null
+              },
+            image: el.image,
+            description: el.description,
+            productURL: el.productURL,
+            genre: genre,
+            store: "Kristina Records",
+            urls: urls
 
-//         })
 
-//         // Get all records from the database
-//         const allRecords = await Record.find();
-//         // Delete records that are not present on the website
-//         for (const record of allRecords) {
-//         if (!records.some((r) => r.recId === record.recId)) {
-//             await Record.deleteOne({ recId: record.recId });
-//         }
-//         }
+        })
+
+        // Get all records from the database
+        const allRecords = await Record.find();
+        // Delete records that are not present on the website
+        for (const record of allRecords) {
+        if (!detailScrub.some((r) => r.recId === record.recId)) {
+            await Record.deleteOne({ recId: record.recId });
+        }
+        }
 
         
-//         // Store the database object matched using the findOne method other wise return null
-//         // Need collate the data-item-id and replace the artist/recordName as values to search the database by
-//         const existingRecord = await Record.findOne({ recId: `${el.recId}` });
-//         if (existingRecord) {
-//             const databaseRecord = radash.pick(existingRecord, [existingRecord.artist, existingRecord.recordName, existingRecord.price.full, existingRecord.price.discounted, existingRecord.price.image, existingRecord.price.productURL])
-//             const updatedRecord = radash.pick(el, [el.artist, el.recordName, el.price.full, el.price.discounted, el.price.image, el.price.productURL])
-//             if(!radash.isEqual(databaseRecord, updatedRecord)){
-//                 await existingRecord.updateOne(el)
-//             } 
-//         } else {
-//             // Save the individual model to mongoDB using mongoose save method  
-//             await kristinaRecords.save();
-//         }
+        // Store the database object matched using the findOne method other wise return null
+        // Need collate the data-item-id and replace the artist/recordName as values to search the database by
+        const existingRecord = await Record.findOne({ recId: `${el.recId}` });
+        if (existingRecord) {
+            const databaseRecord = radash.pick(existingRecord, [existingRecord.artist, existingRecord.recordName, existingRecord.price.full, existingRecord.price.discounted, existingRecord.price.image, existingRecord.price.productURL, existingRecord.urls, existingRecord.description, existingRecord.label])
+            const updatedRecord = radash.pick(el, [el.artist, el.recordName, el.price.full, el.price.discounted, el.price.image, el.price.productURL, el.urls, el.urls, el.description])
+            if(!radash.isEqual(databaseRecord, updatedRecord)){
+                await existingRecord.updateOne(el)
+            } 
+        } else {
+            // Save the individual model to mongoDB using mongoose save method  
+            await kristinaRecords.save();
+        }
 
-//     })   
+    })   
 }
 scrape();
 

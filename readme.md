@@ -8,7 +8,7 @@ The data extracted includes the artist name, record name, price (full and discou
 
 **The scrape function collates, cleans and outputs each individual record as an object like so:**
 
-![alt text](https://i.imgur.com/lyjIVpc.png)
+![alt text](https://i.imgur.com/9MkksbZ.png)
 
 ## Tech Stack
 
