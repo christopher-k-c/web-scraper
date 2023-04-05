@@ -25,14 +25,14 @@ The data extracted includes the artist name, record name, price (full and discou
 ## To-do:
 
 - [x] Only want code to add to database if it does not already exist (Mongoose tinker)
-- [ ] Need to comment code; make concise descriptions / explanations  
+- [ ] Need to comment code; make concise descriptions/explanations  
 - [ ] Add conditional that takes into account records that are missing audio/descriptions
   - [ ] Line 129, maybe target .content instead then add if inside page.evaluate()
-- [ ] Separate logic/processes into reusable functions/make more modular; clean up the code
-- [ ] Connect up to Mongodb Online cluster
+- [ ] Separate logic/processes into reusable functions/make them more modular; clean up the code
+- [ ] Connect up to MongoDB Online cluster
     - [ ] Set-up dot-env
 - [ ] Dynamically scrape all categories on Kristina 
-- [ ] Decided on the collection/document design - (Maybe should have started with this but wanted to get coding) 
+- [ ] Decide on the collection/document design - (Maybe should have started with this but wanted to get coding) 
   - [ ] Embedded or Reference
   - [ ] Record store, artist and record relationships etc 
 - [ ] Look into cron-tab/job/scheduling 
