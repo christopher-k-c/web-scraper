@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const puppeteer = require('puppeteer');
 const {Record} = require("./models/Record");
 const radash = require('radash');
+const _ = require('lodash');
 
 async function scrape() {
 
@@ -116,140 +117,142 @@ async function scrape() {
 
     // await browser.close();
 
+    console.log(records.length, "records len!")
+    
+
     let detailScrub = [];
 
     for(let b = 0; b < records.length; b++){
-
-        await page.goto(records[b].productURL)
+        const duplicateRecord = Object.assign({}, records[b]);
         try {
-        await page.waitForSelector('.audio-block .sqs-block-content .sqs-audio-embed')
-
-        const label = await page.evaluate(() => {
-            // Get id from body
-            const recordId = document.body.id;
-            // Get Label 
-            const label = document.querySelector('.productitem-excerpt p:first-of-type')?.innerText
-            // Array of tracks
-            const audio = document.querySelectorAll('.audio-block .sqs-block-content .sqs-audio-embed')
-            // // Grab description using an optional chaining operator ?. - if the p tag is not avaiable return unidentified otherwise access the textContent
-            const description = document.querySelector('.html-block .sqs-block-content p')?.textContent;
-            // Initialize an empty array
-            const urls = []
-            let descrProp;
-            let labelProp;
-            let deatilObject = {}
-
-            
-            
-            if (audio.length > 0) {
-                // let trackObjects;
-                audio.forEach(el => {
-                    // Get the artist name of the current track
-                    const recordArtist = el.querySelector('.artistName').textContent;
-                    // Get the record name of the current track
-                    const recordTitle = el.querySelector('.title-wrapper .title').textContent;
-                    // Construct an object of key and pair values 
-                    const trackObjects = {
-                        recordId: recordId,
-                        songUrl: el.getAttribute('data-url') || null,
-                        songArtist: recordArtist || null,
-                        songName: recordTitle || null,
-                        // description: description ? document.querySelector('.html-block .sqs-block-content p').textContent : null 
-                    }
+            await page.goto(records[b].productURL)
+            await page.waitForSelector('.audio-block .sqs-block-content .sqs-audio-embed')
+            // Get details from page
+            const label = await page.evaluate(() => {
+                console.log("hello world")
+                // Get id from body
+                const recordId = document.body.id;
+                // Get Label 
+                const label = document.querySelector('.productitem-excerpt p:first-of-type')?.innerText
+                // Array of tracks
+                const audio = document.querySelectorAll('.audio-block .sqs-block-content .sqs-audio-embed')
+                console.log(audio)
+                // // Grab description using an optional chaining operator ?. - if the p tag is not avaiable return unidentified otherwise access the textContent
+                const description = document.querySelector('.html-block .sqs-block-content p')?.textContent;
+                // Initialize an empty array
+                const urls = []
+                let descrProp;
+                let labelProp;
+                let detailObject = {}
     
-                    // Push object 
-                    urls.push(trackObjects)
-                })
-            } 
-
-            let descObject;
-            if(description){
-                descObject = {
-                    description: description
-                }  
-            }
-            descrProp = descObject
-
-            let labelValue;
-            if(label){
-                labelValue = {
-                    label: label
+                if (audio.length > 0) {
+                    audio.forEach(el => {
+                        const recordArtist = el.querySelector('.artistName').textContent;
+                        const recordTitle = el.querySelector('.title-wrapper .title').textContent;
+                        const trackObjects = {
+                            recordId: recordId,
+                            songUrl: el.getAttribute('data-url') || null,
+                            songArtist: recordArtist || null,
+                            songName: recordTitle || null,
+                        }
+                        urls.push(trackObjects)
+                    })
+                } 
+    
+                let descObject;
+                if(description){
+                    descObject = {
+                        description: description
+                    }  
                 }
-            }
-            labelProp = labelValue
-
-            if(labelProp){
-                deatilObject = Object.assign({}, deatilObject, labelProp)
-            }
-            if(descrProp){
-                deatilObject = Object.assign({}, deatilObject, descrProp)
-            }
-            if(urls){
-                deatilObject = Object.assign({}, deatilObject, {urls})
-            }                    
+                descrProp = descObject
+    
+                let labelValue;
+                if(label){
+                    labelValue = {
+                        label: label
+                    }
+                }
+                labelProp = labelValue
+    
+                if(labelProp){
+                    detailObject = _.merge( detailObject, labelProp)
+                }
+                if(descrProp){
+                    detailObject = _.merge(detailObject, descrProp)
+                }
+                if(urls){
+                    detailObject = _.merge(detailObject, {urls})
+                }            
+                return detailObject 
         });
-        console.log(label);
+
+        const combinedObjects = _.merge(duplicateRecord, label);
+
+        detailScrub.push(combinedObjects)
+        
       } catch (error) {
         console.log('Element not found!');
-      }
-
-      
-      detailScrub.push(deatilObject);
+      }                
+    
     }
 
+    console.log(detailScrub)
+
+
+
+    // console.log(detailScrub)
 
 
 
 
-    
 
+// // Replace recorfs with detailScrub
+//     // Iterate over records array
+//     records.forEach(async (el) => {
 
+//         // Invoke a new instance of the Record model 
+//         const kristinaRecords = new Record({
 
-    // Iterate over records array
-    records.forEach(async (el) => {
+//             recId: el.recId,
+//             artist: el.artist,
+//             recordName: el.recordName,
+//             price: {
+//                 discounted: el.price.sale || null,
+//                 full: el.price.full || null
+//               },
+//             image: el.image,
+//             productURL: el.productURL,
+//             genre: genre,
+//             store: "Kristina Records"
 
-        // Invoke a new instance of the Record model 
-        const kristinaRecords = new Record({
+//         })
 
-            recId: el.recId,
-            artist: el.artist,
-            recordName: el.recordName,
-            price: {
-                discounted: el.price.sale || null,
-                full: el.price.full || null
-              },
-            image: el.image,
-            productURL: el.productURL,
-            genre: genre,
-            store: "Kristina Records"
-
-        })
-
-        // Get all records from the database
-        const allRecords = await Record.find();
-        // Delete records that are not present on the website
-        for (const record of allRecords) {
-        if (!records.some((r) => r.recId === record.recId)) {
-            await Record.deleteOne({ recId: record.recId });
-        }
-        }
+//         // Get all records from the database
+//         const allRecords = await Record.find();
+//         // Delete records that are not present on the website
+//         for (const record of allRecords) {
+//         if (!records.some((r) => r.recId === record.recId)) {
+//             await Record.deleteOne({ recId: record.recId });
+//         }
+//         }
 
         
-        // Store the database object matched using the findOne method other wise return null
-        // Need collate the data-item-id and replace the artist/recordName as values to search the database by
-        const existingRecord = await Record.findOne({ recId: `${el.recId}` });
-        if (existingRecord) {
-            const databaseRecord = radash.pick(existingRecord, [existingRecord.artist, existingRecord.recordName, existingRecord.price.full, existingRecord.price.discounted, existingRecord.price.image, existingRecord.price.productURL])
-            const updatedRecord = radash.pick(el, [el.artist, el.recordName, el.price.full, el.price.discounted, el.price.image, el.price.productURL])
-            if(!radash.isEqual(databaseRecord, updatedRecord)){
-                await existingRecord.updateOne(el)
-            } 
-        } else {
-            // Save the individual model to mongoDB using mongoose save method  
-            await kristinaRecords.save();
-        }
+//         // Store the database object matched using the findOne method other wise return null
+//         // Need collate the data-item-id and replace the artist/recordName as values to search the database by
+//         const existingRecord = await Record.findOne({ recId: `${el.recId}` });
+//         if (existingRecord) {
+//             const databaseRecord = radash.pick(existingRecord, [existingRecord.artist, existingRecord.recordName, existingRecord.price.full, existingRecord.price.discounted, existingRecord.price.image, existingRecord.price.productURL])
+//             const updatedRecord = radash.pick(el, [el.artist, el.recordName, el.price.full, el.price.discounted, el.price.image, el.price.productURL])
+//             if(!radash.isEqual(databaseRecord, updatedRecord)){
+//                 await existingRecord.updateOne(el)
+//             } 
+//         } else {
+//             // Save the individual model to mongoDB using mongoose save method  
+//             await kristinaRecords.save();
+//         }
 
-    })   
+//     })   
 }
 scrape();
 
