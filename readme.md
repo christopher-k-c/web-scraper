@@ -28,6 +28,7 @@ The data extracted includes the artist name, record name, price (full and discou
 - [ ] Need to comment code; make concise descriptions / explanations  
 - [ ] Add conditional that takes into account records that are missing audio/descriptions
   - [ ] Line 129, maybe target .content instead then add if inside page.evaluate()
+- [ ] Separate logic/processes into reusable functions/make more modular; clean up the code
 - [ ] Connect up to Mongodb Online cluster
     - [ ] Set-up dot-env
 - [ ] Dynamically scrape all categories on Kristina 
